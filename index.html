@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Monitor</title>
+</head>
+<body>
+  <style>
+    .ok {
+      color: #0f0;
+    }
+    .alert {
+      color: #f00;
+      font-size: 300%;
+    }
+  </style>
+
+  <div id="app" class="ok">
+    OK
+  </div>
+
+  <div id="status"></div>
+
+  <script>
+    var app = document.getElementById('app')
+    var soundStatus = document.getElementById('status')
+    var maxSound = 0
+
+    var pinger;
+
+    function check() {
+      fetch('/status')
+        .then(resp => resp.json())
+        .then(json => {
+          console.log(json)
+          if (json.status === 'alert') {
+            app.setAttribute('class', 'alert')
+            app.innerHTML = 'ALERT! Check on Ebi!'
+            clearInterval(pinger)
+          }
+
+          maxSound = json.maxSound
+          soundStatus.innerHTML = maxSound
+
+        })
+        .catch(e => {
+          app.innerHTML('ERROR!')
+          console.error(e)
+        })
+    }
+
+    pinger = setInterval(check, 500)
+  </script>
+</body>
+</html>
